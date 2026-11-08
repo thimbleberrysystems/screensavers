@@ -6,10 +6,11 @@ namespace ThimbleBerry.Screensavers;
 /// <summary>Settings shared by the screensaver and the idle watcher, stored as JSON in %APPDATA%.</summary>
 public sealed class SaverSettings
 {
-    public static readonly string[] SceneIds = ["clock", "starfield", "constellations", "text", "text3d"];
+    public static readonly string[] SceneIds =
+        ["clock", "text", "text3d", "marquee", "starfield", "constellations", "polygons", "bubbles", "ribbons", "pipes"];
     public static readonly string[] Text3DMotions = ["spin", "seesaw", "wobble", "tumble"];
 
-    /// <summary>Which scene to show: clock, starfield, constellations, text or text3d.</summary>
+    /// <summary>Which scene to show; one of <see cref="SceneIds"/>.</summary>
     public string Scene { get; set; } = "clock";
 
     /// <summary>Message for the custom text scene. Line breaks are kept; long lines wrap.</summary>
@@ -24,11 +25,11 @@ public sealed class SaverSettings
     /// <summary>How the 3D text moves: spin, seesaw, wobble or tumble.</summary>
     public string Text3DMotion { get; set; } = "spin";
 
-    /// <summary>3D text rotation speed, 1 (slow) to 10 (fast).</summary>
+    /// <summary>3D text rotation and marquee scroll speed, 1 (slow) to 10 (fast).</summary>
     public int Text3DSpeed { get; set; } = 5;
 
-    /// <summary>Upper limit on frames per second. Scenes may draw less often than this.</summary>
-    public int MaxFps { get; set; } = 15;
+    /// <summary>Upper limit on frames per second. Each scene draws at its own, usually lower, rate.</summary>
+    public int MaxFps { get; set; } = 30;
 
     /// <summary>Halve the frame rate when running on battery.</summary>
     public bool ReduceOnBattery { get; set; } = true;

@@ -25,8 +25,10 @@ This project fixes that in two ways:
 ## Low power by design
 
 - Native Windows app with no browser engine. Frames are drawn on a timer and nothing runs in between.
-- Each scene uses the lowest frame rate that still looks right: the clock draws **once a
-  second**, the other scenes 12–15 times a second. There's also a global FPS cap.
+- Each scene uses the lowest frame rate that still looks right: the clock and text draw
+  **once a second**, most others 12–20 times a second. There's also a global FPS cap.
+- Scenes that build up a picture (ribbons, pipes) draw only the new piece each frame;
+  bubbles are drawn once and then just copied around.
 - Frame rate halves on battery.
 - Drawing stops while the display is off (for example after Windows turns the monitor off).
 - Runs in Windows 11 **efficiency mode** (EcoQoS) at below-normal priority.
@@ -35,13 +37,23 @@ This project fixes that in two ways:
 
 ## Scenes
 
-| Scene | FPS | Notes |
-|---|---|---|
-| Drifting clock | 1 | Time and date that drift around the screen. Lowest power. Default. |
-| Starfield | 15 | Slow flight through sparse stars |
-| Constellations | 12 | Drifting points joined by faint berry-coloured lines |
-| Custom text | 1 | Your own message (multi-line, your colour and size), drifting slowly. Long text wraps and shrinks to fit. |
-| 3D text | 20 | Your custom text as solid, shaded 3D letters that spin, seesaw, wobble or tumble. Drawn with a small software 3D renderer, about 2–4% of one core at 1080p. |
+CPU figures are measured at 1080p, for one monitor.
+
+| Scene | FPS | CPU | Notes |
+|---|---|---|---|
+| Drifting clock | 1 | ~0.2% | Time and date that drift around the screen. Lowest power. Default. |
+| Custom text | 1 | ~0.1% | Your own message (multi-line, your colour and size), drifting slowly. Long text wraps and shrinks to fit. |
+| 3D text | 20 | ~4.5% | Your custom text as solid, shaded 3D letters that spin, seesaw, wobble or tumble |
+| Marquee | 30 | ~3.4% | Your custom text scrolling across the screen, at a new height each pass |
+| Starfield | 15 | ~0.9% | Slow flight through sparse stars |
+| Constellations | 12 | ~2.5% | Drifting points joined by faint berry-coloured lines |
+| Polygon trails | 20 | ~4% | Two bouncing outlines that leave fading, colour-shifting trails |
+| Bubbles | 20 | ~3.7% | Glossy bubbles that drift and bounce off each other and the edges |
+| Ribbons | 20 | ~2.3% | Twisting ribbons that wind across the screen, build up, then start over |
+| 3D pipes | 20 | ~2.3% | Shaded pipes growing through a 3D grid with rounded joints, then starting over |
+
+The classic-style scenes are original versions of familiar screensaver ideas, with no
+Microsoft names, logos or assets.
 
 ## Install
 
@@ -89,14 +101,14 @@ Saver Settings** and click **Settings**. Settings are stored in
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `Scene` | `clock` | `clock`, `starfield`, `constellations`, `text` or `text3d` |
+| `Scene` | `clock` | `clock`, `text`, `text3d`, `marquee`, `starfield`, `constellations`, `polygons`, `bubbles`, `ribbons` or `pipes` |
 | `CustomText` | `ThimbleBerry` | Message for the custom text scene (up to 500 characters; line breaks kept) |
 | `CustomTextColor` | `#E6E6EB` | Text colour as `#RRGGBB` |
 | `CustomTextSize` | `12` | Text height as % of screen height (3–40) |
 | `Text3DMotion` | `spin` | 3D text movement: `spin`, `seesaw`, `wobble` or `tumble` |
-| `Text3DSpeed` | `5` | 3D text rotation speed, 1 (slow) to 10 (fast) |
+| `Text3DSpeed` | `5` | 3D text rotation and marquee scroll speed, 1 (slow) to 10 (fast) |
 | `Brightness` | `0.6` | 0.1 to 1.0 |
-| `MaxFps` | `15` | Upper limit on frame rate |
+| `MaxFps` | `30` | Upper limit on frame rate (each scene uses its own lower rate, listed above) |
 | `ReduceOnBattery` | `true` | Halve frame rate on battery |
 | `IdleMinutes` | `10` | Minutes of real inactivity before starting |
 | `IgnoreInjectedInput` | `true` | Ignore simulated input (Caffeine, jigglers, scripts) |

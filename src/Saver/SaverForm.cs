@@ -153,7 +153,11 @@ public sealed class SaverForm : Form
 
     protected override void Dispose(bool disposing)
     {
-        if (disposing) _timer.Dispose();
+        if (disposing)
+        {
+            _timer.Dispose();
+            _scene.Dispose();
+        }
         base.Dispose(disposing);
     }
 }

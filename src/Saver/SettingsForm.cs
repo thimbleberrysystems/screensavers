@@ -64,12 +64,12 @@ public sealed class SettingsForm : Form
         Row("Scene", _scene);
         Row("Brightness", _brightness);
 
-        Heading("Custom text and 3D text scenes");
+        Heading("Text scenes (custom text, 3D text, marquee)");
         Row("Text", _customText);
         Row("Colour", _customColor);
         Row("Size (% of screen height)", _customSize);
         Row("3D motion", _motion);
-        Row("3D speed (1–10)", _speed);
+        Row("Speed (1–10)", _speed);
         _motion.Items.AddRange(["Spin", "Seesaw", "Wobble", "Tumble"]);
         _customColor.Click += (_, _) =>
         {
@@ -140,9 +140,10 @@ public sealed class SettingsForm : Form
     private void UpdateCustomTextEnabled()
     {
         var id = (_scene.SelectedItem as SceneItem)?.Id;
-        bool text = id is "text" or "text3d";
+        bool text = id is "text" or "text3d" or "marquee";
         _customText.Enabled = _customColor.Enabled = _customSize.Enabled = text;
-        _motion.Enabled = _speed.Enabled = id == "text3d";
+        _motion.Enabled = id == "text3d";
+        _speed.Enabled = id is "text3d" or "marquee";
     }
 
     private void ApplyAndSave()
