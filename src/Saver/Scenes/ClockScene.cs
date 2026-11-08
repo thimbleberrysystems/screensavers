@@ -9,11 +9,10 @@ namespace ThimbleBerry.Screensavers.Saver.Scenes;
 /// </summary>
 public sealed class ClockScene : Scene
 {
+    private readonly Drifter _drift = new();
     private Font? _timeFont;
     private Font? _dateFont;
     private SizeF _blockSize;
-    private PointF _pos;
-    private PointF _vel;
 
     public override int PreferredFps => 1;
 
@@ -27,28 +26,13 @@ public sealed class ClockScene : Scene
 
         using var bmp = new Bitmap(1, 1);
         using var g = Graphics.FromImage(bmp);
-        var t = g.MeasureString("00:00", _timeFont);
+        var t = g.MeasureString("00:00 am", _timeFont);
         var d = g.MeasureString("Wednesday, September 30", _dateFont);
         _blockSize = new SizeF(Math.Max(t.Width, d.Width), t.Height + d.Height);
-
-        _pos = new PointF(
-            (float)Rng.NextDouble() * Math.Max(1, Size.Width - _blockSize.Width),
-            (float)Rng.NextDouble() * Math.Max(1, Size.Height - _blockSize.Height));
-        // About 3 px/s on a 1080p screen: slow enough to look still, fast enough to avoid burn-in.
-        float speed = Size.Height / 360f;
-        double angle = Rng.NextDouble() * Math.PI * 2;
-        _vel = new PointF((float)Math.Cos(angle) * speed, (float)Math.Sin(angle) * speed);
+        _drift.Reset(Size, _blockSize, Rng);
     }
 
-    public override void Update(double dt)
-    {
-        float maxX = Math.Max(0, Size.Width - _blockSize.Width);
-        float maxY = Math.Max(0, Size.Height - _blockSize.Height);
-        _pos.X += (float)(_vel.X * dt);
-        _pos.Y += (float)(_vel.Y * dt);
-        if (_pos.X < 0 || _pos.X > maxX) { _vel.X = -_vel.X; _pos.X = Math.Clamp(_pos.X, 0, maxX); }
-        if (_pos.Y < 0 || _pos.Y > maxY) { _vel.Y = -_vel.Y; _pos.Y = Math.Clamp(_pos.Y, 0, maxY); }
-    }
+    public override void Update(double dt) => _drift.Update(dt);
 
     public override void Render(Graphics g)
     {
@@ -63,11 +47,12 @@ public sealed class ClockScene : Scene
 
         var timeSize = g.MeasureString(time, _timeFont);
         var dateSize = g.MeasureString(date, _dateFont);
-        float cx = _pos.X + _blockSize.Width / 2;
+        var pos = _drift.Position;
+        float cx = pos.X + _blockSize.Width / 2;
 
         using var timeBrush = new SolidBrush(Dim(230, 230, 235));
         using var dateBrush = new SolidBrush(Dim(200, 120, 150, 0.8)); // berry tint
-        g.DrawString(time, _timeFont, timeBrush, cx - timeSize.Width / 2, _pos.Y);
-        g.DrawString(date, _dateFont, dateBrush, cx - dateSize.Width / 2, _pos.Y + timeSize.Height * 0.92f);
+        g.DrawString(time, _timeFont, timeBrush, cx - timeSize.Width / 2, pos.Y);
+        g.DrawString(date, _dateFont, dateBrush, cx - dateSize.Width / 2, pos.Y + timeSize.Height * 0.92f);
     }
 }

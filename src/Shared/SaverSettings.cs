@@ -6,10 +6,19 @@ namespace ThimbleBerry.Screensavers;
 /// <summary>Settings shared by the screensaver and the idle watcher, stored as JSON in %APPDATA%.</summary>
 public sealed class SaverSettings
 {
-    public static readonly string[] SceneIds = ["clock", "starfield", "constellations"];
+    public static readonly string[] SceneIds = ["clock", "starfield", "constellations", "text"];
 
-    /// <summary>Which scene to show: clock, starfield or constellations.</summary>
+    /// <summary>Which scene to show: clock, starfield, constellations or text.</summary>
     public string Scene { get; set; } = "clock";
+
+    /// <summary>Message for the custom text scene. Line breaks are kept; long lines wrap.</summary>
+    public string CustomText { get; set; } = "ThimbleBerry";
+
+    /// <summary>Colour of the custom text, as #RRGGBB.</summary>
+    public string CustomTextColor { get; set; } = "#E6E6EB";
+
+    /// <summary>Height of the custom text as a percentage of the screen height (shrinks to fit if needed).</summary>
+    public int CustomTextSize { get; set; } = 12;
 
     /// <summary>Upper limit on frames per second. Scenes may draw less often than this.</summary>
     public int MaxFps { get; set; } = 15;
@@ -77,6 +86,28 @@ public sealed class SaverSettings
         Brightness = Math.Clamp(Brightness, 0.1, 1.0);
         IdleMinutes = Math.Clamp(IdleMinutes, 1, 240);
         MouseMoveThreshold = Math.Clamp(MouseMoveThreshold, 0, 200);
+        CustomText ??= "";
+        if (CustomText.Length > 500) CustomText = CustomText[..500];
+        CustomTextColor = ColorTranslator.ToHtml(ParseColor(CustomTextColor));
+        CustomTextSize = Math.Clamp(CustomTextSize, 3, 40);
         return this;
+    }
+
+    /// <summary>Reads #RRGGBB or a colour name; falls back to soft white.</summary>
+    public static Color ParseColor(string? value)
+    {
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                var c = ColorTranslator.FromHtml(value.Trim());
+                return Color.FromArgb(c.R, c.G, c.B);
+            }
+        }
+        catch
+        {
+            // fall through
+        }
+        return Color.FromArgb(0xE6, 0xE6, 0xEB);
     }
 }

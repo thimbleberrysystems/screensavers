@@ -39,10 +39,11 @@ public abstract class Scene
 
 public static class SceneFactory
 {
-    public static Scene Create(string id) => id switch
+    public static Scene Create(SaverSettings settings) => settings.Scene switch
     {
         "starfield" => new StarfieldScene(),
         "constellations" => new ConstellationScene(),
+        "text" => new TextScene(settings),
         _ => new ClockScene(),
     };
 
@@ -50,6 +51,7 @@ public static class SceneFactory
     {
         "starfield" => "Starfield",
         "constellations" => "Constellations",
+        "text" => "Custom text",
         _ => "Drifting clock (lowest power)",
     };
 }

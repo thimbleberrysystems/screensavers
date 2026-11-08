@@ -40,6 +40,7 @@ This project fixes that in two ways:
 | Drifting clock | 1 | Time and date that drift around the screen. Lowest power. Default. |
 | Starfield | 15 | Slow flight through sparse stars |
 | Constellations | 12 | Drifting points joined by faint berry-coloured lines |
+| Custom text | 1 | Your own message (multi-line, your colour and size), drifting slowly. Long text wraps and shrinks to fit. |
 
 ## Install
 
@@ -66,7 +67,10 @@ Saver Settings** and click **Settings**. Settings are stored in
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `Scene` | `clock` | `clock`, `starfield` or `constellations` |
+| `Scene` | `clock` | `clock`, `starfield`, `constellations` or `text` |
+| `CustomText` | `ThimbleBerry` | Message for the custom text scene (up to 500 characters; line breaks kept) |
+| `CustomTextColor` | `#E6E6EB` | Text colour as `#RRGGBB` |
+| `CustomTextSize` | `12` | Text height as % of screen height (3–40) |
 | `Brightness` | `0.6` | 0.1 to 1.0 |
 | `MaxFps` | `15` | Upper limit on frame rate |
 | `ReduceOnBattery` | `true` | Halve frame rate on battery |

@@ -48,7 +48,7 @@ internal static class Program
         var settings = SaverSettings.Load();
 
         var forms = Screen.AllScreens
-            .Select(s => new SaverForm(settings, SceneFactory.Create(settings.Scene), s.Bounds))
+            .Select(s => new SaverForm(settings, SceneFactory.Create(settings), s.Bounds))
             .ToList();
 
         var context = new SaverContext(settings, forms);
@@ -64,7 +64,7 @@ internal static class Program
         if (parent == IntPtr.Zero || !Native.IsWindow(parent)) return 0;
         PowerUtil.EnableEfficiencyMode();
         var settings = SaverSettings.Load();
-        Application.Run(new SaverForm(settings, SceneFactory.Create(settings.Scene), Rectangle.Empty, parent));
+        Application.Run(new SaverForm(settings, SceneFactory.Create(settings), Rectangle.Empty, parent));
         return 0;
     }
 

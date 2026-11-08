@@ -11,6 +11,13 @@ public sealed class SettingsForm : Form
 
     private readonly ComboBox _scene = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 260 };
     private readonly TrackBar _brightness = new() { Minimum = 10, Maximum = 100, TickFrequency = 10, Width = 260 };
+    private readonly TextBox _customText = new()
+    {
+        Multiline = true, AcceptsReturn = true, ScrollBars = ScrollBars.Vertical, Width = 260, Height = 70, MaxLength = 500,
+    };
+    private readonly Button _customColor = new() { Text = "Choose…", AutoSize = true };
+    private readonly NumericUpDown _customSize = new() { Minimum = 3, Maximum = 40, Width = 80 };
+    private Color _customColorValue;
     private readonly NumericUpDown _maxFps = new() { Minimum = 1, Maximum = 60, Width = 80 };
     private readonly CheckBox _reduceOnBattery = new() { Text = "Halve the frame rate on battery", AutoSize = true };
     private readonly NumericUpDown _idleMinutes = new() { Minimum = 1, Maximum = 240, Width = 80 };
@@ -56,6 +63,17 @@ public sealed class SettingsForm : Form
         Row("Scene", _scene);
         Row("Brightness", _brightness);
 
+        Heading("Custom text scene");
+        Row("Text", _customText);
+        Row("Colour", _customColor);
+        Row("Size (% of screen height)", _customSize);
+        _customColor.Click += (_, _) =>
+        {
+            using var dlg = new ColorDialog { Color = _customColorValue, FullOpen = true };
+            if (dlg.ShowDialog(this) == DialogResult.OK) SetCustomColor(dlg.Color);
+        };
+        _scene.SelectedIndexChanged += (_, _) => UpdateCustomTextEnabled();
+
         Heading("Power");
         Row("Max frames per second", _maxFps);
         Full(_reduceOnBattery);
@@ -99,6 +117,24 @@ public sealed class SettingsForm : Form
         _mouseThreshold.Value = _settings.MouseMoveThreshold;
         _lockOnExit.Checked = _settings.LockOnExit;
         _skipFullScreen.Checked = _settings.SkipWhenFullScreen;
+        _customText.Text = _settings.CustomText.ReplaceLineEndings("\r\n");
+        _customSize.Value = _settings.CustomTextSize;
+        SetCustomColor(SaverSettings.ParseColor(_settings.CustomTextColor));
+        UpdateCustomTextEnabled();
+    }
+
+    private void SetCustomColor(Color color)
+    {
+        _customColorValue = color;
+        _customColor.BackColor = color;
+        _customColor.ForeColor = color.GetBrightness() > 0.5f ? Color.Black : Color.White;
+        _customColor.Text = ColorTranslator.ToHtml(color);
+    }
+
+    private void UpdateCustomTextEnabled()
+    {
+        bool on = (_scene.SelectedItem as SceneItem)?.Id == "text";
+        _customText.Enabled = _customColor.Enabled = _customSize.Enabled = on;
     }
 
     private void ApplyAndSave()
@@ -113,6 +149,9 @@ public sealed class SettingsForm : Form
         _settings.MouseMoveThreshold = (int)_mouseThreshold.Value;
         _settings.LockOnExit = _lockOnExit.Checked;
         _settings.SkipWhenFullScreen = _skipFullScreen.Checked;
+        _settings.CustomText = _customText.Text.ReplaceLineEndings("\n");
+        _settings.CustomTextColor = ColorTranslator.ToHtml(_customColorValue);
+        _settings.CustomTextSize = (int)_customSize.Value;
         _settings.Save();
         SyncWindowsTimeout();
     }
