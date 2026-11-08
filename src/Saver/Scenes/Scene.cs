@@ -66,7 +66,8 @@ public static class SceneFactory
         "bubbles" => new BubblesScene(),
         "ribbons" => new RibbonsScene(),
         "pipes" => new PipesScene(),
-        _ => new ClockScene(),
+        "clock" => new ClockScene(),
+        _ => new RibbonsScene(),
     };
 
     public static string DisplayName(string id) => id switch
@@ -80,6 +81,7 @@ public static class SceneFactory
         "bubbles" => "Bubbles",
         "ribbons" => "Ribbons",
         "pipes" => "3D pipes",
-        _ => "Drifting clock (lowest power)",
+        "clock" => "Drifting clock (lowest power)",
+        _ => id,
     };
 }

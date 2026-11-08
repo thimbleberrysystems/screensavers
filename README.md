@@ -3,6 +3,15 @@
 Low-power Windows screensavers that still work while keep-awake tools such as
 **Caffeine**, **PowerToys Awake**, mouse jigglers or presentation tools are running.
 
+![Ribbons, the default scene](docs/images/scene-ribbons.png)
+
+- **10 scenes:** ribbons, 3D pipes, bubbles, polygon trails, starfield, constellations,
+  a drifting clock, and three for your own text (flat, rotating 3D and scrolling marquee)
+- **Low power:** each scene uses under 5% of one CPU core at 1080p, and the clock and
+  text scenes well under 1%
+- **Works with keep-awake tools:** fake key presses and mouse moves are ignored
+- **Easy install:** a per-user installer with no admin rights or .NET install needed
+
 ## Why keep-awake tools break normal screensavers
 
 Windows starts a screensaver after its idle timer runs out. Keep-awake tools get in the way:
@@ -37,11 +46,38 @@ This project fixes that in two ways:
 
 ## Scenes
 
+<table>
+  <tr>
+    <td width="50%"><img src="docs/images/scene-ribbons.png" alt="Ribbons"><br><b>Ribbons</b> (default): twisting ribbons that wind across the screen</td>
+    <td width="50%"><img src="docs/images/scene-pipes.png" alt="3D pipes"><br><b>3D pipes</b>: shaded pipes growing through a 3D grid</td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/scene-bubbles.png" alt="Bubbles"><br><b>Bubbles</b>: glossy bubbles bouncing off each other</td>
+    <td><img src="docs/images/scene-polygons.png" alt="Polygon trails"><br><b>Polygon trails</b>: bouncing outlines with fading trails</td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/scene-text3d.png" alt="3D text"><br><b>3D text</b>: your text as solid letters that spin, seesaw, wobble or tumble</td>
+    <td><img src="docs/images/scene-marquee.png" alt="Marquee"><br><b>Marquee</b>: your text scrolling across the screen</td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/scene-text.png" alt="Custom text"><br><b>Custom text</b>: your message drifting slowly (lowest power)</td>
+    <td><img src="docs/images/scene-clock.png" alt="Drifting clock"><br><b>Drifting clock</b>: time and date drifting slowly (lowest power)</td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/scene-starfield.png" alt="Starfield"><br><b>Starfield</b>: a slow flight through sparse stars</td>
+    <td><img src="docs/images/scene-constellations.png" alt="Constellations"><br><b>Constellations</b>: drifting points joined by faint lines</td>
+  </tr>
+</table>
+
+Screenshots are taken at 85% brightness (the default is 60%). Regenerate them with
+`dotnet run --project tools/Screenshots`.
+
 CPU figures are measured at 1080p, for one monitor.
 
 | Scene | FPS | CPU | Notes |
 |---|---|---|---|
-| Drifting clock | 1 | ~0.2% | Time and date that drift around the screen. Lowest power. Default. |
+| Ribbons | 20 | ~2.3% | Twisting ribbons that wind across the screen, build up, then start over. **Default.** |
+| Drifting clock | 1 | ~0.2% | Time and date that drift around the screen. Lowest power. |
 | Custom text | 1 | ~0.1% | Your own message (multi-line, your colour and size), drifting slowly. Long text wraps and shrinks to fit. |
 | 3D text | 20 | ~4.5% | Your custom text as solid, shaded 3D letters that spin, seesaw, wobble or tumble |
 | Marquee | 30 | ~3.4% | Your custom text scrolling across the screen, at a new height each pass |
@@ -49,7 +85,6 @@ CPU figures are measured at 1080p, for one monitor.
 | Constellations | 12 | ~2.5% | Drifting points joined by faint berry-coloured lines |
 | Polygon trails | 20 | ~4% | Two bouncing outlines that leave fading, colour-shifting trails |
 | Bubbles | 20 | ~3.7% | Glossy bubbles that drift and bounce off each other and the edges |
-| Ribbons | 20 | ~2.3% | Twisting ribbons that wind across the screen, build up, then start over |
 | 3D pipes | 20 | ~2.3% | Shaded pipes growing through a 3D grid with rounded joints, then starting over |
 
 The classic-style scenes are original versions of familiar screensaver ideas, with no
@@ -96,12 +131,15 @@ Uninstall with `.\scripts\uninstall.ps1`.
 ## Settings
 
 Right-click the berry icon in the tray and choose **Settings…**, or open Windows **Screen
-Saver Settings** and click **Settings**. Settings are stored in
-`%APPDATA%\ThimbleBerry\Screensavers\settings.json`:
+Saver Settings** and click **Settings**.
+
+<img src="docs/images/settings.png" alt="Settings dialog" width="400">
+
+Settings are stored in `%APPDATA%\ThimbleBerry\Screensavers\settings.json`:
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `Scene` | `clock` | `clock`, `text`, `text3d`, `marquee`, `starfield`, `constellations`, `polygons`, `bubbles`, `ribbons` or `pipes` |
+| `Scene` | `ribbons` | `clock`, `text`, `text3d`, `marquee`, `starfield`, `constellations`, `polygons`, `bubbles`, `ribbons` or `pipes` |
 | `CustomText` | `ThimbleBerry` | Message for the custom text scene (up to 500 characters; line breaks kept) |
 | `CustomTextColor` | `#E6E6EB` | Text colour as `#RRGGBB` |
 | `CustomTextSize` | `12` | Text height as % of screen height (3–40) |
@@ -142,7 +180,9 @@ dotnet build -c Release
 src/Shared   Input monitoring (real vs. fake input), settings, power helpers, Win32 interop
 src/Saver    The .scr: /s full screen, /p preview, /c settings; scenes live in Scenes/
 src/Watcher  Tray app that starts the screensaver after real inactivity
-scripts/     install.ps1 / uninstall.ps1
+installer/   Inno Setup script for the Setup .exe
+scripts/     install.ps1 / uninstall.ps1 / build-installer.ps1
+tools/       Screenshots: renders every scene to docs/images for this README
 ```
 
 To add a scene, subclass `Scene` in `src/Saver/Scenes`, set `PreferredFps` as low as it

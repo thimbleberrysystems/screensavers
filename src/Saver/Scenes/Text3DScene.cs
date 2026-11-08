@@ -110,7 +110,9 @@ public sealed class Text3DScene : Scene
         float w = bounds.Width * scale, h = bounds.Height * scale;
         float extent = tumble ? diagonal * scale : Math.Max(w, h);
         _cameraDistance = extent * 2.4 + _depth;
-        _block = tumble ? new SizeF(extent * 1.3f, extent * 1.3f) : new SizeF(w * 1.3f, Math.Max(h, w * 0.25f) * 1.3f);
+        // Room for rotation and perspective. Wide text that rolls or tilts sweeps up and down
+        // by a fraction of its width, so the height allowance grows with the width.
+        _block = tumble ? new SizeF(extent * 1.3f, extent * 1.3f) : new SizeF(w * 1.3f, h * 1.5f + w * 0.35f);
         _block = new SizeF(Math.Min(_block.Width, Size.Width), Math.Min(_block.Height, Size.Height));
 
         _projFront = _contours.Select(c => new PointF[c.Length]).ToArray();

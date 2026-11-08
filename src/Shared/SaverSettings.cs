@@ -11,7 +11,7 @@ public sealed class SaverSettings
     public static readonly string[] Text3DMotions = ["spin", "seesaw", "wobble", "tumble"];
 
     /// <summary>Which scene to show; one of <see cref="SceneIds"/>.</summary>
-    public string Scene { get; set; } = "clock";
+    public string Scene { get; set; } = "ribbons";
 
     /// <summary>Message for the custom text scene. Line breaks are kept; long lines wrap.</summary>
     public string CustomText { get; set; } = "ThimbleBerry";
@@ -89,7 +89,7 @@ public sealed class SaverSettings
 
     public SaverSettings Normalize()
     {
-        if (!SceneIds.Contains(Scene)) Scene = "clock";
+        if (!SceneIds.Contains(Scene)) Scene = "ribbons";
         MaxFps = Math.Clamp(MaxFps, 1, 60);
         Brightness = Math.Clamp(Brightness, 0.1, 1.0);
         IdleMinutes = Math.Clamp(IdleMinutes, 1, 240);

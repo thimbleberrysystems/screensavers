@@ -6,7 +6,7 @@ namespace ThimbleBerry.Screensavers.Saver;
 /// <summary>The settings dialog Windows opens from Screen Saver Settings → Settings.</summary>
 public sealed class SettingsForm : Form
 {
-    private readonly SaverSettings _settings = SaverSettings.Load();
+    private readonly SaverSettings _settings;
 
     private readonly ComboBox _scene = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 260 };
     private readonly TrackBar _brightness = new() { Minimum = 10, Maximum = 100, TickFrequency = 10, Width = 260 };
@@ -28,8 +28,10 @@ public sealed class SettingsForm : Form
     private readonly CheckBox _lockOnExit = new() { Text = "Lock the PC when the screensaver closes", AutoSize = true };
     private readonly CheckBox _skipFullScreen = new() { Text = "Don't start over full-screen apps or presentations", AutoSize = true };
 
-    public SettingsForm()
+    /// <param name="settings">Settings to show; loads the saved settings when null.</param>
+    public SettingsForm(SaverSettings? settings = null)
     {
+        _settings = settings ?? SaverSettings.Load();
         Text = "ThimbleBerry Screensaver Settings";
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = MinimizeBox = false;
