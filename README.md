@@ -94,8 +94,12 @@ Microsoft names, logos or assets.
 
 ### With the installer (recommended)
 
-Run `ThimbleBerry-Screensavers-Setup-<version>.exe`. It installs for the current user (no
-admin rights) and includes the .NET runtime, so nothing else is needed. The wizard asks:
+**[Download the latest installer from Releases](https://github.com/thimbleberrysystems/screensavers/releases/latest)**
+(`ThimbleBerry-Screensavers-Setup-<version>.exe`).
+
+It installs for the current user (no admin rights) and includes the .NET runtime, so
+nothing else is needed. The installer isn't code-signed yet, so Windows may show "Windows
+protected your PC": click **More info → Run anyway**. The wizard asks:
 
 - whether to make ThimbleBerry your Windows screensaver
 - whether to run the idle watcher, needed if you use Caffeine, PowerToys Awake or similar
@@ -103,13 +107,26 @@ admin rights) and includes the .NET runtime, so nothing else is needed. The wiza
 
 Uninstall from **Settings → Apps → Installed apps → ThimbleBerry Screensavers**.
 
-To build the installer (needs the .NET 10 SDK and Inno Setup 6,
+To build the installer yourself (needs the .NET 10 SDK and Inno Setup 6,
 `winget install JRSoftware.InnoSetup`):
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\build-installer.ps1
 # -> artifacts\installer\ThimbleBerry-Screensavers-Setup-<version>.exe
 ```
+
+### Releases are built automatically
+
+GitHub Actions (`.github/workflows/build.yml`) builds the installer on every push and pull
+request; download it from the run's **Artifacts**. To publish a release, push a version tag:
+
+```powershell
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+The workflow then creates a GitHub Release for that tag with the installer attached. Tags
+with a suffix, such as `v0.2.0-beta`, are marked as pre-releases.
 
 ### From source with the scripts
 
@@ -183,6 +200,14 @@ src/Watcher  Tray app that starts the screensaver after real inactivity
 installer/   Inno Setup script for the Setup .exe
 scripts/     install.ps1 / uninstall.ps1 / build-installer.ps1
 tools/       Screenshots: renders every scene to docs/images for this README
+```
+
+To test the full-screen saver without it closing as soon as you touch the mouse, set
+`THIMBLEBERRY_TEST_SECONDS`. It then ignores input and closes itself after that many
+seconds (60 at most):
+
+```powershell
+$env:THIMBLEBERRY_TEST_SECONDS = 10; .\src\Saver\bin\Release\net10.0-windows\ThimbleBerry.exe /s
 ```
 
 To add a scene, subclass `Scene` in `src/Saver/Scenes`, set `PreferredFps` as low as it

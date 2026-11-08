@@ -4,6 +4,9 @@
 #ifndef AppVersion
   #define AppVersion "0.1.0"
 #endif
+#ifndef NumericVersion
+  #define NumericVersion "0.1.0.0"
+#endif
 #ifndef StagingDir
   #define StagingDir "..\artifacts\installer-staging"
 #endif
@@ -20,6 +23,7 @@ AppId={{7D3C2A61-9B5E-4E8A-A7F1-3C6B2E9D4F10}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} {#AppVersion}
+VersionInfoVersion={#NumericVersion}
 AppPublisher={#Publisher}
 AppPublisherURL=https://github.com/thimbleberrysystems/screensavers
 ; Per-user install: no admin rights needed.

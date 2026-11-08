@@ -1,0 +1,82 @@
+name: Build installer
+
+# - Every push and pull request: build the installer and keep it as a run artifact.
+# - Pushing a tag like v1.2.3: also publish a GitHub Release with the installer attached.
+#   git tag v1.2.3 && git push origin v1.2.3
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write # needed to create releases
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          $iscc = @("${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe", "$env:ProgramFiles\Inno Setup 6\ISCC.exe") |
+            Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $iscc) { choco install innosetup -y --no-progress }
+
+      - name: Pick version
+        id: version
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF_TYPE -eq 'tag') {
+            $v = $env:GITHUB_REF_NAME.TrimStart('v')
+          } else {
+            # Untagged builds: version from Directory.Build.props plus the run number.
+            [xml]$props = Get-Content Directory.Build.props
+            $base = ($props.Project.PropertyGroup | Where-Object { $_.Version } | Select-Object -First 1).Version
+            $v = "$base-ci.$env:GITHUB_RUN_NUMBER"
+          }
+          "version=$v" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          Write-Host "Version: $v"
+
+      - name: Build
+        shell: pwsh
+        run: dotnet build -c Release --nologo
+
+      - name: Build installer
+        id: installer
+        shell: pwsh
+        run: ./scripts/build-installer.ps1 -Version '${{ steps.version.outputs.version }}'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ThimbleBerry-Screensavers-Setup-${{ steps.version.outputs.version }}
+          path: ${{ steps.installer.outputs.installer }}
+          if-no-files-found: error
+
+      - name: Publish release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.installer.outputs.installer }}
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          body: |
+            ## Install
+
+            Download **ThimbleBerry-Screensavers-Setup-${{ steps.version.outputs.version }}.exe** below and run it.
+            It installs for your user only (no admin rights) and includes everything it needs.
+
+            Windows may show "Windows protected your PC" because the installer isn't code-signed yet:
+            click **More info → Run anyway**.

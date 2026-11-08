@@ -113,6 +113,53 @@ public static class Native
     public static extern IntPtr GetForegroundWindow();
 
     [DllImport("user32.dll")]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern bool BringWindowToTop(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+    [DllImport("kernel32.dll")]
+    public static extern uint GetCurrentThreadId();
+
+    public static readonly IntPtr HWND_TOPMOST = new(-1);
+    public const uint SWP_NOSIZE = 0x0001;
+    public const uint SWP_NOMOVE = 0x0002;
+    public const uint SWP_NOACTIVATE = 0x0010;
+    public const uint SWP_SHOWWINDOW = 0x0040;
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint flags);
+
+    /// <summary>
+    /// Brings a window to the front even when Windows' foreground lock would refuse
+    /// (for example right after simulated input from a keep-awake tool). Temporarily
+    /// joining the current foreground thread's input queue is the standard way to do this.
+    /// </summary>
+    public static bool ForceForeground(IntPtr hWnd)
+    {
+        SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+        var foreground = GetForegroundWindow();
+        if (foreground == hWnd) return true;
+
+        uint me = GetCurrentThreadId();
+        uint them = foreground == IntPtr.Zero ? 0 : GetWindowThreadProcessId(foreground, out _);
+        bool attached = them != 0 && them != me && AttachThreadInput(me, them, true);
+        try
+        {
+            BringWindowToTop(hWnd);
+            SetForegroundWindow(hWnd);
+        }
+        finally
+        {
+            if (attached) AttachThreadInput(me, them, false);
+        }
+        return GetForegroundWindow() == hWnd;
+    }
+
+    [DllImport("user32.dll")]
     public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
 
     // ---- Process / token -----------------------------------------------------------
