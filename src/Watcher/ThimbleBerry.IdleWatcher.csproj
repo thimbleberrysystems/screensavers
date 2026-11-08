@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>ThimbleBerry.IdleWatcher</AssemblyName>
+    <RootNamespace>ThimbleBerry.Screensavers.Watcher</RootNamespace>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <Description>Starts the ThimbleBerry screensaver after real inactivity, even while keep-awake tools are running</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\ThimbleBerry.Screensavers.Shared.csproj" />
+  </ItemGroup>
+</Project>

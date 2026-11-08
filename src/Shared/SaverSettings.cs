@@ -1,0 +1,82 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace ThimbleBerry.Screensavers;
+
+/// <summary>Settings shared by the screensaver and the idle watcher, stored as JSON in %APPDATA%.</summary>
+public sealed class SaverSettings
+{
+    public static readonly string[] SceneIds = ["clock", "starfield", "constellations"];
+
+    /// <summary>Which scene to show: clock, starfield or constellations.</summary>
+    public string Scene { get; set; } = "clock";
+
+    /// <summary>Upper limit on frames per second. Scenes may draw less often than this.</summary>
+    public int MaxFps { get; set; } = 15;
+
+    /// <summary>Halve the frame rate when running on battery.</summary>
+    public bool ReduceOnBattery { get; set; } = true;
+
+    /// <summary>Overall brightness, 0.1 to 1.0. Lower is kinder to OLED panels and uses less power on them.</summary>
+    public double Brightness { get; set; } = 0.6;
+
+    /// <summary>Minutes of real (human) inactivity before the idle watcher starts the screensaver.</summary>
+    public int IdleMinutes { get; set; } = 10;
+
+    /// <summary>Ignore synthetic input from keep-awake tools (Caffeine, mouse jigglers, scripts).</summary>
+    public bool IgnoreInjectedInput { get; set; } = true;
+
+    /// <summary>Ignore F13–F24 even when they look physical. Keep-awake tools commonly press F15.</summary>
+    public bool IgnoreF13ToF24 { get; set; } = true;
+
+    /// <summary>Pixels the mouse must move before the screensaver closes.</summary>
+    public int MouseMoveThreshold { get; set; } = 12;
+
+    /// <summary>Lock the PC when the screensaver is dismissed.</summary>
+    public bool LockOnExit { get; set; } = false;
+
+    /// <summary>Don't start the screensaver while a full-screen app, game or presentation is in front.</summary>
+    public bool SkipWhenFullScreen { get; set; } = true;
+
+    [JsonIgnore]
+    public static string SettingsDirectory =>
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ThimbleBerry", "Screensavers");
+
+    [JsonIgnore]
+    public static string SettingsPath => Path.Combine(SettingsDirectory, "settings.json");
+
+    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+
+    public static SaverSettings Load()
+    {
+        try
+        {
+            if (File.Exists(SettingsPath))
+            {
+                var loaded = JsonSerializer.Deserialize<SaverSettings>(File.ReadAllText(SettingsPath), JsonOptions);
+                if (loaded is not null) return loaded.Normalize();
+            }
+        }
+        catch
+        {
+            // A corrupt settings file should never stop the screensaver from running.
+        }
+        return new SaverSettings();
+    }
+
+    public void Save()
+    {
+        Directory.CreateDirectory(SettingsDirectory);
+        File.WriteAllText(SettingsPath, JsonSerializer.Serialize(Normalize(), JsonOptions));
+    }
+
+    public SaverSettings Normalize()
+    {
+        if (!SceneIds.Contains(Scene)) Scene = "clock";
+        MaxFps = Math.Clamp(MaxFps, 1, 60);
+        Brightness = Math.Clamp(Brightness, 0.1, 1.0);
+        IdleMinutes = Math.Clamp(IdleMinutes, 1, 240);
+        MouseMoveThreshold = Math.Clamp(MouseMoveThreshold, 0, 200);
+        return this;
+    }
+}

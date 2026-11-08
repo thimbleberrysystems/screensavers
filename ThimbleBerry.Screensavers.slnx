@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Saver/">
+    <Project Path="src/Saver/ThimbleBerry.Saver.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/ThimbleBerry.Screensavers.Shared.csproj" />
+  </Folder>
+  <Folder Name="/src/Watcher/">
+    <Project Path="src/Watcher/ThimbleBerry.IdleWatcher.csproj" />
+  </Folder>
+</Solution>

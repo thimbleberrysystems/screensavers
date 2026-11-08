@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>ThimbleBerry</AssemblyName>
+    <RootNamespace>ThimbleBerry.Screensavers.Saver</RootNamespace>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <Description>ThimbleBerry low-power screensaver</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\ThimbleBerry.Screensavers.Shared.csproj" />
+  </ItemGroup>
+</Project>
