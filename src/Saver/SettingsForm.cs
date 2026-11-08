@@ -18,6 +18,7 @@ public sealed class SettingsForm : Form
     private readonly NumericUpDown _customSize = new() { Minimum = 3, Maximum = 40, Width = 80 };
     private readonly ComboBox _motion = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 160 };
     private readonly NumericUpDown _speed = new() { Minimum = 1, Maximum = 10, Width = 80 };
+    private readonly CheckBox _bounce = new() { Text = "Bounce the 3D text around the screen", AutoSize = true };
     private Color _customColorValue;
     private readonly NumericUpDown _maxFps = new() { Minimum = 1, Maximum = 60, Width = 80 };
     private readonly CheckBox _reduceOnBattery = new() { Text = "Halve the frame rate on battery", AutoSize = true };
@@ -72,6 +73,7 @@ public sealed class SettingsForm : Form
         Row("Size (% of screen height)", _customSize);
         Row("3D motion", _motion);
         Row("Speed (1–10)", _speed);
+        Row("", _bounce);
         _motion.Items.AddRange(["Spin", "Seesaw", "Wobble", "Tumble"]);
         _customColor.Click += (_, _) =>
         {
@@ -127,6 +129,7 @@ public sealed class SettingsForm : Form
         _customSize.Value = _settings.CustomTextSize;
         _motion.SelectedIndex = Math.Max(0, Array.IndexOf(SaverSettings.Text3DMotions, _settings.Text3DMotion));
         _speed.Value = _settings.Text3DSpeed;
+        _bounce.Checked = _settings.Text3DBounce;
         SetCustomColor(SaverSettings.ParseColor(_settings.CustomTextColor));
         UpdateCustomTextEnabled();
     }
@@ -144,7 +147,7 @@ public sealed class SettingsForm : Form
         var id = (_scene.SelectedItem as SceneItem)?.Id;
         bool text = id is "text" or "text3d" or "marquee";
         _customText.Enabled = _customColor.Enabled = _customSize.Enabled = text;
-        _motion.Enabled = id == "text3d";
+        _motion.Enabled = _bounce.Enabled = id == "text3d";
         _speed.Enabled = id is "text3d" or "marquee";
     }
 
@@ -165,6 +168,7 @@ public sealed class SettingsForm : Form
         _settings.CustomTextSize = (int)_customSize.Value;
         _settings.Text3DMotion = SaverSettings.Text3DMotions[Math.Max(0, _motion.SelectedIndex)];
         _settings.Text3DSpeed = (int)_speed.Value;
+        _settings.Text3DBounce = _bounce.Checked;
         _settings.Save();
         WindowsScreensaver.SyncTimeout(_settings.IdleMinutes);
     }

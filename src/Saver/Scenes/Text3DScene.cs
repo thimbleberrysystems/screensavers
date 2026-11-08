@@ -4,7 +4,7 @@ namespace ThimbleBerry.Screensavers.Saver.Scenes;
 
 /// <summary>
 /// Your custom text as solid, extruded 3D letters that rotate (spin, seesaw, wobble or tumble)
-/// while drifting slowly around the screen.
+/// while bouncing around the screen (or, with bouncing off, drifting slowly).
 ///
 /// Rendering is plain GDI+ with a small hand-written 3D pipeline: the text outline is
 /// flattened into polygons once, then each frame the front face, back face and side walls
@@ -29,6 +29,7 @@ public sealed class Text3DScene : Scene
     private readonly double _sizePercent;
     private readonly string _motion;
     private readonly double _speed;
+    private readonly bool _bounce;
     private readonly Drifter _drift = new();
 
     // Model: one closed polygon per glyph contour, centred on the origin, in pixels.
@@ -56,15 +57,18 @@ public sealed class Text3DScene : Scene
         _sizePercent = settings.CustomTextSize;
         _motion = settings.Text3DMotion;
         _speed = settings.Text3DSpeed / 5.0;
+        _bounce = settings.Text3DBounce;
     }
 
+    // 20 fps even when bouncing: 30 fps more than doubled CPU use in testing.
     public override int PreferredFps => 20;
 
     protected override void OnResize()
     {
         BuildModel();
         BuildBrushes();
-        _drift.Reset(Size, _block, Rng);
+        // Bouncing: about 90 px/s on a 1080p screen at the default speed (~4.5 px per frame).
+        _drift.Reset(Size, _block, Rng, _bounce ? (float)(Size.Height / 12.0 * _speed) : null);
     }
 
     private void BuildModel()

@@ -13,7 +13,8 @@ public sealed class Drifter
 
     public PointF Position => _pos;
 
-    public void Reset(Size area, SizeF block, Random rng)
+    /// <param name="pixelsPerSecond">Speed; by default about 3 px/s on a 1080p screen.</param>
+    public void Reset(Size area, SizeF block, Random rng, float? pixelsPerSecond = null)
     {
         _area = area;
         _block = block;
@@ -21,8 +22,9 @@ public sealed class Drifter
             (float)rng.NextDouble() * Math.Max(0, area.Width - block.Width),
             (float)rng.NextDouble() * Math.Max(0, area.Height - block.Height));
         // About 3 px/s on a 1080p screen: slow enough to look still, fast enough to avoid burn-in.
-        float speed = area.Height / 360f;
-        double angle = rng.NextDouble() * Math.PI * 2;
+        float speed = pixelsPerSecond ?? area.Height / 360f;
+        // Avoid near-horizontal or near-vertical paths, which look like it's stuck on one line.
+        double angle = (rng.Next(4) * 90 + 25 + rng.NextDouble() * 40) * Math.PI / 180;
         _vel = new PointF((float)Math.Cos(angle) * speed, (float)Math.Sin(angle) * speed);
     }
 

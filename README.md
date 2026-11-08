@@ -56,7 +56,7 @@ This project fixes that in two ways:
     <td><img src="docs/images/scene-polygons.png" alt="Polygon trails"><br><b>Polygon trails</b>: bouncing outlines with fading trails</td>
   </tr>
   <tr>
-    <td><img src="docs/images/scene-text3d.png" alt="3D text"><br><b>3D text</b>: your text as solid letters that spin, seesaw, wobble or tumble</td>
+    <td><img src="docs/images/scene-text3d.png" alt="3D text"><br><b>3D text</b>: your text as solid letters that spin, seesaw, wobble or tumble while bouncing around the screen</td>
     <td><img src="docs/images/scene-marquee.png" alt="Marquee"><br><b>Marquee</b>: your text scrolling across the screen</td>
   </tr>
   <tr>
@@ -79,7 +79,7 @@ CPU figures are measured at 1080p, for one monitor.
 | Ribbons | 20 | ~2.3% | Twisting ribbons that wind across the screen, build up, then start over. **Default.** |
 | Drifting clock | 1 | ~0.2% | Time and date that drift around the screen. Lowest power. |
 | Custom text | 1 | ~0.1% | Your own message (multi-line, your colour and size), drifting slowly. Long text wraps and shrinks to fit. |
-| 3D text | 20 | ~4.5% | Your custom text as solid, shaded 3D letters that spin, seesaw, wobble or tumble |
+| 3D text | 20 | ~5% | Your custom text as solid, shaded 3D letters that spin, seesaw, wobble or tumble, bouncing around the screen |
 | Marquee | 30 | ~3.4% | Your custom text scrolling across the screen, at a new height each pass |
 | Starfield | 15 | ~0.9% | Slow flight through sparse stars |
 | Constellations | 12 | ~2.5% | Drifting points joined by faint berry-coloured lines |
@@ -162,6 +162,7 @@ Settings are stored in `%APPDATA%\ThimbleBerry\Screensavers\settings.json`:
 | `CustomTextSize` | `12` | Text height as % of screen height (3–40) |
 | `Text3DMotion` | `spin` | 3D text movement: `spin`, `seesaw`, `wobble` or `tumble` |
 | `Text3DSpeed` | `5` | 3D text rotation and marquee scroll speed, 1 (slow) to 10 (fast) |
+| `Text3DBounce` | `true` | Bounce the 3D text around the screen; `false` gives a slow drift instead |
 | `Brightness` | `0.6` | 0.1 to 1.0 |
 | `MaxFps` | `30` | Upper limit on frame rate (each scene uses its own lower rate, listed above) |
 | `ReduceOnBattery` | `true` | Halve frame rate on battery |

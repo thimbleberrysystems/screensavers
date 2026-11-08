@@ -28,6 +28,9 @@ public sealed class SaverSettings
     /// <summary>3D text rotation and marquee scroll speed, 1 (slow) to 10 (fast).</summary>
     public int Text3DSpeed { get; set; } = 5;
 
+    /// <summary>Move the 3D text around the screen, bouncing off the edges (off: a slow drift).</summary>
+    public bool Text3DBounce { get; set; } = true;
+
     /// <summary>Upper limit on frames per second. Each scene draws at its own, usually lower, rate.</summary>
     public int MaxFps { get; set; } = 30;
 
