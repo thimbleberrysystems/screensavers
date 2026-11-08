@@ -14,6 +14,10 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        // Used by the installer: save the chosen idle time and sync Windows' own timeout.
+        if (args.Length == 2 && args[0].Equals("--idle-minutes", StringComparison.OrdinalIgnoreCase))
+            return SetIdleMinutes(args[1]);
+
         ApplicationConfiguration.Initialize();
         var (mode, hwnd) = ParseArgs(args);
 
@@ -65,6 +69,16 @@ internal static class Program
         PowerUtil.EnableEfficiencyMode();
         var settings = SaverSettings.Load();
         Application.Run(new SaverForm(settings, SceneFactory.Create(settings), Rectangle.Empty, parent));
+        return 0;
+    }
+
+    private static int SetIdleMinutes(string value)
+    {
+        if (!int.TryParse(value, out int minutes)) return 1;
+        var settings = SaverSettings.Load();
+        settings.IdleMinutes = minutes;
+        settings.Save(); // Save() clamps to the allowed range
+        WindowsScreensaver.SyncTimeout(settings.IdleMinutes);
         return 0;
     }
 

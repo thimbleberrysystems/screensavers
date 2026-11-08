@@ -44,6 +44,27 @@ This project fixes that in two ways:
 
 ## Install
 
+### With the installer (recommended)
+
+Run `ThimbleBerry-Screensavers-Setup-<version>.exe`. It installs for the current user (no
+admin rights) and includes the .NET runtime, so nothing else is needed. The wizard asks:
+
+- whether to make ThimbleBerry your Windows screensaver
+- whether to run the idle watcher, needed if you use Caffeine, PowerToys Awake or similar
+- how many idle minutes before the screensaver starts
+
+Uninstall from **Settings → Apps → Installed apps → ThimbleBerry Screensavers**.
+
+To build the installer (needs the .NET 10 SDK and Inno Setup 6,
+`winget install JRSoftware.InnoSetup`):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\build-installer.ps1
+# -> artifacts\installer\ThimbleBerry-Screensavers-Setup-<version>.exe
+```
+
+### From source with the scripts
+
 Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) to build.
 
 ```powershell

@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Microsoft.Win32;
 using ThimbleBerry.Screensavers.Saver.Scenes;
 
 namespace ThimbleBerry.Screensavers.Saver;
@@ -153,24 +152,7 @@ public sealed class SettingsForm : Form
         _settings.CustomTextColor = ColorTranslator.ToHtml(_customColorValue);
         _settings.CustomTextSize = (int)_customSize.Value;
         _settings.Save();
-        SyncWindowsTimeout();
-    }
-
-    /// <summary>If Windows is set to use this screensaver, keep its own timeout in step with ours.</summary>
-    private void SyncWindowsTimeout()
-    {
-        try
-        {
-            using var key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop");
-            var current = key?.GetValue("SCRNSAVE.EXE") as string;
-            if (current is null || !current.EndsWith(SaverInstance.SaverFileName, StringComparison.OrdinalIgnoreCase)) return;
-            Native.SystemParametersInfo(Native.SPI_SETSCREENSAVETIMEOUT, (uint)(_settings.IdleMinutes * 60), IntPtr.Zero,
-                Native.SPIF_UPDATEINIFILE | Native.SPIF_SENDCHANGE);
-        }
-        catch
-        {
-            // Not essential.
-        }
+        WindowsScreensaver.SyncTimeout(_settings.IdleMinutes);
     }
 
     private sealed record SceneItem(string Id)
