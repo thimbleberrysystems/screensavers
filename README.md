@@ -41,6 +41,7 @@ This project fixes that in two ways:
 | Starfield | 15 | Slow flight through sparse stars |
 | Constellations | 12 | Drifting points joined by faint berry-coloured lines |
 | Custom text | 1 | Your own message (multi-line, your colour and size), drifting slowly. Long text wraps and shrinks to fit. |
+| 3D text | 20 | Your custom text as solid, shaded 3D letters that spin, seesaw, wobble or tumble. Drawn with a small software 3D renderer, about 2–4% of one core at 1080p. |
 
 ## Install
 
@@ -88,10 +89,12 @@ Saver Settings** and click **Settings**. Settings are stored in
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `Scene` | `clock` | `clock`, `starfield`, `constellations` or `text` |
+| `Scene` | `clock` | `clock`, `starfield`, `constellations`, `text` or `text3d` |
 | `CustomText` | `ThimbleBerry` | Message for the custom text scene (up to 500 characters; line breaks kept) |
 | `CustomTextColor` | `#E6E6EB` | Text colour as `#RRGGBB` |
 | `CustomTextSize` | `12` | Text height as % of screen height (3–40) |
+| `Text3DMotion` | `spin` | 3D text movement: `spin`, `seesaw`, `wobble` or `tumble` |
+| `Text3DSpeed` | `5` | 3D text rotation speed, 1 (slow) to 10 (fast) |
 | `Brightness` | `0.6` | 0.1 to 1.0 |
 | `MaxFps` | `15` | Upper limit on frame rate |
 | `ReduceOnBattery` | `true` | Halve frame rate on battery |

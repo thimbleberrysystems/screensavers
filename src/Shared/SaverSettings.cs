@@ -6,9 +6,10 @@ namespace ThimbleBerry.Screensavers;
 /// <summary>Settings shared by the screensaver and the idle watcher, stored as JSON in %APPDATA%.</summary>
 public sealed class SaverSettings
 {
-    public static readonly string[] SceneIds = ["clock", "starfield", "constellations", "text"];
+    public static readonly string[] SceneIds = ["clock", "starfield", "constellations", "text", "text3d"];
+    public static readonly string[] Text3DMotions = ["spin", "seesaw", "wobble", "tumble"];
 
-    /// <summary>Which scene to show: clock, starfield, constellations or text.</summary>
+    /// <summary>Which scene to show: clock, starfield, constellations, text or text3d.</summary>
     public string Scene { get; set; } = "clock";
 
     /// <summary>Message for the custom text scene. Line breaks are kept; long lines wrap.</summary>
@@ -19,6 +20,12 @@ public sealed class SaverSettings
 
     /// <summary>Height of the custom text as a percentage of the screen height (shrinks to fit if needed).</summary>
     public int CustomTextSize { get; set; } = 12;
+
+    /// <summary>How the 3D text moves: spin, seesaw, wobble or tumble.</summary>
+    public string Text3DMotion { get; set; } = "spin";
+
+    /// <summary>3D text rotation speed, 1 (slow) to 10 (fast).</summary>
+    public int Text3DSpeed { get; set; } = 5;
 
     /// <summary>Upper limit on frames per second. Scenes may draw less often than this.</summary>
     public int MaxFps { get; set; } = 15;
@@ -90,6 +97,8 @@ public sealed class SaverSettings
         if (CustomText.Length > 500) CustomText = CustomText[..500];
         CustomTextColor = ColorTranslator.ToHtml(ParseColor(CustomTextColor));
         CustomTextSize = Math.Clamp(CustomTextSize, 3, 40);
+        if (!Text3DMotions.Contains(Text3DMotion)) Text3DMotion = "spin";
+        Text3DSpeed = Math.Clamp(Text3DSpeed, 1, 10);
         return this;
     }
 

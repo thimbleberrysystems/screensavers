@@ -16,6 +16,8 @@ public sealed class SettingsForm : Form
     };
     private readonly Button _customColor = new() { Text = "Choose…", AutoSize = true };
     private readonly NumericUpDown _customSize = new() { Minimum = 3, Maximum = 40, Width = 80 };
+    private readonly ComboBox _motion = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 160 };
+    private readonly NumericUpDown _speed = new() { Minimum = 1, Maximum = 10, Width = 80 };
     private Color _customColorValue;
     private readonly NumericUpDown _maxFps = new() { Minimum = 1, Maximum = 60, Width = 80 };
     private readonly CheckBox _reduceOnBattery = new() { Text = "Halve the frame rate on battery", AutoSize = true };
@@ -62,10 +64,13 @@ public sealed class SettingsForm : Form
         Row("Scene", _scene);
         Row("Brightness", _brightness);
 
-        Heading("Custom text scene");
+        Heading("Custom text and 3D text scenes");
         Row("Text", _customText);
         Row("Colour", _customColor);
         Row("Size (% of screen height)", _customSize);
+        Row("3D motion", _motion);
+        Row("3D speed (1–10)", _speed);
+        _motion.Items.AddRange(["Spin", "Seesaw", "Wobble", "Tumble"]);
         _customColor.Click += (_, _) =>
         {
             using var dlg = new ColorDialog { Color = _customColorValue, FullOpen = true };
@@ -118,6 +123,8 @@ public sealed class SettingsForm : Form
         _skipFullScreen.Checked = _settings.SkipWhenFullScreen;
         _customText.Text = _settings.CustomText.ReplaceLineEndings("\r\n");
         _customSize.Value = _settings.CustomTextSize;
+        _motion.SelectedIndex = Math.Max(0, Array.IndexOf(SaverSettings.Text3DMotions, _settings.Text3DMotion));
+        _speed.Value = _settings.Text3DSpeed;
         SetCustomColor(SaverSettings.ParseColor(_settings.CustomTextColor));
         UpdateCustomTextEnabled();
     }
@@ -132,8 +139,10 @@ public sealed class SettingsForm : Form
 
     private void UpdateCustomTextEnabled()
     {
-        bool on = (_scene.SelectedItem as SceneItem)?.Id == "text";
-        _customText.Enabled = _customColor.Enabled = _customSize.Enabled = on;
+        var id = (_scene.SelectedItem as SceneItem)?.Id;
+        bool text = id is "text" or "text3d";
+        _customText.Enabled = _customColor.Enabled = _customSize.Enabled = text;
+        _motion.Enabled = _speed.Enabled = id == "text3d";
     }
 
     private void ApplyAndSave()
@@ -151,6 +160,8 @@ public sealed class SettingsForm : Form
         _settings.CustomText = _customText.Text.ReplaceLineEndings("\n");
         _settings.CustomTextColor = ColorTranslator.ToHtml(_customColorValue);
         _settings.CustomTextSize = (int)_customSize.Value;
+        _settings.Text3DMotion = SaverSettings.Text3DMotions[Math.Max(0, _motion.SelectedIndex)];
+        _settings.Text3DSpeed = (int)_speed.Value;
         _settings.Save();
         WindowsScreensaver.SyncTimeout(_settings.IdleMinutes);
     }

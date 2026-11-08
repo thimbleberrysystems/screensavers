@@ -44,6 +44,7 @@ public static class SceneFactory
         "starfield" => new StarfieldScene(),
         "constellations" => new ConstellationScene(),
         "text" => new TextScene(settings),
+        "text3d" => new Text3DScene(settings),
         _ => new ClockScene(),
     };
 
@@ -52,6 +53,7 @@ public static class SceneFactory
         "starfield" => "Starfield",
         "constellations" => "Constellations",
         "text" => "Custom text",
+        "text3d" => "3D text",
         _ => "Drifting clock (lowest power)",
     };
 }
